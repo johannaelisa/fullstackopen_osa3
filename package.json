@@ -6,14 +6,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:backend": "node index.cjs",
-    "start:frontend": "vite",
-    "dev:backend": "nodemon index.js",
-    "dev:frontend": "vite",
-    "build:frontend": "vite build",
-    "lint:frontend": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview:frontend": "vite preview",
-    "test:backend": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.cjs && vite",
+    "dev:backend": "nodemon index.js && vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
