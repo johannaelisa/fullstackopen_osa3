@@ -55,12 +55,12 @@ let persons = [
     }
 ]
 
-app.get('/', (request, response) => {
+app.get('/api', (request, response) => {
 response.send('<h1>Hello World!</h1>')
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+  response.json(persons)
 })
 
 app.get('/api/info', (request, response) => {
@@ -85,9 +85,6 @@ app.delete('/api/persons/:id', (request, response) => {
   
     response.status(204).end()
 })
-
-
-
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
@@ -118,6 +115,7 @@ app.post('/api/persons', (request, response) => {
 
   response.json(person)
 })
+
 app.use(morgan('combined', {
   skip: function (req, res) { return res.statusCode < 400 }
 }))
