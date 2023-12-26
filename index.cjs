@@ -1,11 +1,11 @@
 const express = require('express')
-
 const morgan = require('morgan')
+const cors = require('cors') //Lisätty
 
 const app = express()
 
-const cors = require('cors') //Lisätty
 app.use(cors()) //Lisätty
+app.use(express.static('dist')) //LIsätty
 
 morgan.token('post', function (req, res) { 
   if (req.method === 'POST') {
