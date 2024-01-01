@@ -34,10 +34,10 @@ app.use(requestLogger)
 
 const mongoose = require('mongoose')
 
-if (process.argv.length<3) {
+/*if (process.argv.length<3) {
   console.log('give password as argument')
   process.exit(1)
-}
+}*/
 
 const password = process.env.MONGODB_PASSWORD
 const url = process.env.MONGODB_URI
