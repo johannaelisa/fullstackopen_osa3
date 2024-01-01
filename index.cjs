@@ -32,7 +32,41 @@ const unknownEndpoint = (request, response) => {
 
 app.use(requestLogger)
 
-let persons = [
+const mongoose = require('mongoose')
+
+if (process.argv.length<3) {
+  console.log('give password as argument')
+  process.exit(1)
+}
+
+const password = process.argv[2]
+const url =
+  `mongodb+srv://johannaelisa:${password}@cluster0.g9zl02b.mongodb.net/phonebookApp?retryWrites=true&w=majority`
+mongoose.set('strictQuery', false)
+mongoose.connect(url)
+
+const personSchema = new mongoose.Schema({
+  name: String,
+  number: String,
+})
+
+const Person = mongoose.model('Person', personSchema)
+
+/*if (process.argv.length < 3) {
+  const person = new Person({
+    name: process.argv[3],
+    number: process.argv[4],
+  })
+  
+  person.save().then(result => {
+    console.log('added ' +  person.name + ' number ' + person.number + ' to phonebook' )
+    mongoose.connection.close()
+  })
+}*/
+
+
+
+/*let persons = [
     {
         "name": "Aarto Hellas",
         "number": "040-123456",
@@ -53,15 +87,20 @@ let persons = [
         "number": "39-23-6423122",
         "id": 4
     }
-]
+]*/
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Person
+  .find({})
+  .then(persons => {
+    response.json(notes);
+  })
 })
+
 
 app.get('/api/info', (request, response) => {
     const scope = persons.length
