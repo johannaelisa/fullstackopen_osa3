@@ -9,6 +9,13 @@ const password = process.env.MONGODB_PASSWORD
 const url = process.env.MONGODB_URI
 mongoose.set('strictQuery', false)
 mongoose.connect(url)
+  .then(() => {
+    console.log('Yhteys Mongo-tietokantaan luotu')
+  })
+  .catch(error => {
+    console.error('Virhe yhdistäessä Mongo-tietokantaan:', error.message)
+  })
+
 
 app.use(cors())
 app.use(express.static('dist'))
