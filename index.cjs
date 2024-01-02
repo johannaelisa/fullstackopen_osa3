@@ -1,12 +1,15 @@
+require('dotenv').config()
 const express = require('express')
-const morgan = require('morgan')
-const cors = require('cors')
-const mongoose = require('mongoose')
-
 const app = express()
 
-const password = process.env.MONGODB_PASSWORD
-const url = process.env.MONGODB_URI
+const morgan = require('morgan')
+const cors = require('cors')
+/*const mongoose = require('mongoose')*/
+const Person = require('./models/person')
+
+
+
+/*const url = process.env.MONGODB_URI
 mongoose.set('strictQuery', false)
 mongoose.connect(url)
   .then(() => {
@@ -14,7 +17,7 @@ mongoose.connect(url)
   })
   .catch(error => {
     console.error('Virhe yhdistäessä Mongo-tietokantaan:', error.message)
-  })
+  })*/
 
 
 app.use(cors())
@@ -44,10 +47,10 @@ const unknownEndpoint = (request, response) => {
 
 app.use(requestLogger)
 
-const personSchema = new mongoose.Schema({
+/*const personSchema = new mongoose.Schema({
   name: String,
   number: String,
-})
+})*/
 
 const Person = mongoose.model('Person', personSchema)
 
@@ -91,6 +94,14 @@ const Person = mongoose.model('Person', personSchema)
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
+
+/*personSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})*/
 
 app.get('/api/persons', (request, response) => {
   Person
