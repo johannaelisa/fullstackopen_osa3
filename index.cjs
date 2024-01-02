@@ -1,11 +1,17 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const mongoose = require('mongoose')
 
 const app = express()
 
-app.use(cors()) //Lisätty
-app.use(express.static('dist')) //LIsätty
+const password = process.env.MONGODB_PASSWORD
+const url = process.env.MONGODB_URI
+mongoose.set('strictQuery', false)
+mongoose.connect(url)
+
+app.use(cors())
+app.use(express.static('dist'))
 
 morgan.token('post', function (req, res) { 
   if (req.method === 'POST') {
@@ -15,7 +21,6 @@ morgan.token('post', function (req, res) {
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms  - :post'))
-
 app.use(express.json())
 
 const requestLogger = (request, response, next) => {
@@ -31,18 +36,6 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(requestLogger)
-
-const mongoose = require('mongoose')
-
-/*if (process.argv.length<3) {
-  console.log('give password as argument')
-  process.exit(1)
-}*/
-
-const password = process.env.MONGODB_PASSWORD
-const url = process.env.MONGODB_URI
-mongoose.set('strictQuery', false)
-mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
   name: String,
@@ -94,7 +87,7 @@ app.get('/', (request, response) => {
 
 app.get('/api/persons', (request, response) => {
   Person
-  .find({})
+  .find()
   .then(persons => {
     response.json(notes);
   })
