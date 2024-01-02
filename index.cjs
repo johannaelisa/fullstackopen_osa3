@@ -3,9 +3,13 @@ const express = require('express')
 const app = express()
 
 const morgan = require('morgan')
+
 const cors = require('cors')
-const Person = require('./models/person.cjs')
 app.use(cors())
+
+const Person = require('./models/person.cjs')
+
+app.use(express.static('build'))
 app.use(express.static('dist'))
 
 morgan.token('post', function (req, res) { 
@@ -16,6 +20,7 @@ morgan.token('post', function (req, res) {
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms  - :post'))
+
 app.use(express.json())
 
 const requestLogger = (request, response, next) => {
@@ -25,12 +30,12 @@ const requestLogger = (request, response, next) => {
   console.log('---')
   next()
 }
+app.use(requestLogger)
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
-app.use(requestLogger)
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
@@ -55,9 +60,7 @@ app.get('/api/info', (request, response) => {
     })
 });
 
-
-
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Person
     .findById(request.params.id)
     .then(person => {
@@ -67,57 +70,51 @@ app.get('/api/persons/:id', (request, response) => {
         response.status(404).end();
       }
     })
-    .catch(error => {
-      console.error('Virhe tietoja haettaessa:', error.message);
-      response.status(500).json({ error: 'Internal Server Error' });
-    });
+    .catch(error => next(error))
 });
 
-
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person
   .findByIdAndDelete(request.params.id)
   .then(() => {
     response.status(204).end();
   })
-  .catch(error => {
-    console.error('Virhe tietoja poistaessa:', error); 
-    response.status(500).json({ error: 'Internal Server Error' });
-  });
+  .catch(error => next(error))
 })
 
+app.post('/api/persons', (request, response, next) => {
+  const body = request.body;
 
-app.post('/api/persons', (request, response) => {
-  const body = request.body
-
-  if (!body.name || !body.number) {
+  if (body.name === '' || body.number === '' || body.name === 'a new name...' || body.number === 'a new number...') {
     return response.status(400).json({ 
       error: 'name or number is missing' 
     });
   }
 
-  Person
-  .findOne({ name: body.name })
-  .then(existingPerson => {
-    if (existingPerson) {
-      return response.status(400).json({ 
-        error: `${body.name} is already in the phonebook` 
-      });
-    } else {
-      const newPerson = new Person({
-        name: body.name,
-        number: body.number,
-      });
+  const newPerson = new Person({
+    name: body.name,
+    number: body.number,
+  });
 
-      newPerson.save()
-      .then(savedPerson => {
-        response.json(savedPerson);
-      })
-    }
+  newPerson.save()
+  .then(savedPerson => {
+    response.json(savedPerson);
   })
-})
+});
 
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body;
 
+  Person.findByIdAndUpdate(request.params.id, { name: body.name, number: body.number }, { new: true })
+    .then(updatedPerson => {
+      if (updatedPerson) {
+        response.json(updatedPerson);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch(error => next(error));
+});
 
 app.use(morgan('combined', {
   skip: function (req, res) { return res.statusCode < 400 }

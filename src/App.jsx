@@ -91,7 +91,7 @@ const App = () => {
       })
       .catch(error => {
         console.error('Error:', error);
-        setErrorMessage(`${newName } has already been removed from the phonebook.`);
+        setErrorMessage(`Failed to save the ${newName } information to the database.`);
         setTimeout(() => {
           setSuccessMessage(null);
         }, 5000);
