@@ -52,7 +52,7 @@ app.use(requestLogger)
   number: String,
 })*/
 
-const Person = mongoose.model('Person', personSchema)
+/*const Person = mongoose.model('Person', personSchema)*/
 
 /*if (process.argv.length < 3) {
   const person = new Person({
