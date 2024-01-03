@@ -91,9 +91,9 @@ const App = () => {
       })
       .catch(error => {
         console.error('Error:', error);
-        setErrorMessage(`Failed to save the ${newName } information to the database.`);
+        setErrorMessage(`${error.response.data.error}`);
         setTimeout(() => {
-          setSuccessMessage(null);
+          setErrorMessage(null);
         }, 5000);
       });
     }

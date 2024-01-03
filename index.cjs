@@ -36,7 +36,6 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
-
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
@@ -47,6 +46,7 @@ app.get('/api/persons', (request, response) => {
   .then(persons => {
     response.json(persons);
   })
+  console.log("Täällä ollaan")
 })
 
 app.get('/api/info', (request, response) => {
@@ -85,10 +85,8 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
   const body = request.body;
 
-  if (body.name === '' || body.number === '' || body.name === 'a new name...' || body.number === 'a new number...') {
-    return response.status(400).json({ 
-      error: 'name or number is missing' 
-    });
+  if (body.name === 'a new name...') {
+    return response.status(400).json({ error: 'Name is missing' });
   }
 
   const newPerson = new Person({
@@ -100,12 +98,13 @@ app.post('/api/persons', (request, response, next) => {
   .then(savedPerson => {
     response.json(savedPerson);
   })
+  .catch(error => next(error))
 });
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body;
 
-  Person.findByIdAndUpdate(request.params.id, { name: body.name, number: body.number }, { new: true })
+  Person.findByIdAndUpdate(request.params.id, { name: body.name, number: body.number }, { new: true, runValidators: true, context: 'query'  })
     .then(updatedPerson => {
       if (updatedPerson) {
         response.json(updatedPerson);
@@ -121,6 +120,20 @@ app.use(morgan('combined', {
 }))
 
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
